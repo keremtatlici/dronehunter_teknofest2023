@@ -21,7 +21,7 @@
             "max_area": 120000
         },
         "yolo_detector_cfg": {
-            "model": "YOLOv4",
+            "model": "YOLOv4Tiny",
             "conf_thresh": 0.25,
             "nms_thresh": 0.5,
             "max_area": 800000,
