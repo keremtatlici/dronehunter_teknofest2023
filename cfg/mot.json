@@ -10,7 +10,7 @@
     "mot_cfg": {
         "detector_type": "YOLO",
         "detector_frame_skip": 5,
-        "class_ids": [1],
+        "class_ids": [0],
 
         "ssd_detector_cfg": {
             "model": "SSDInceptionV2",
