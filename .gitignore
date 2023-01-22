@@ -128,3 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 *.DS_Store
+fastmot/models/osnet_x0_25_msmt17.onnx
+fastmot/models/osnet_x0_25_msmt17.trt
+fastmot/models/yolov4_crowdhuman.onnx
+fastmot/models/yolov4_crowdhuman.trt
