@@ -1,1 +1,2 @@
 python3 app.py --input-uri datasets/peoplewalking.mp4 --mot --show
+./scripts/yolo2onnx.py --config yolov4tiny_drone.cfg --weights yolov4tiny_drone.weights
