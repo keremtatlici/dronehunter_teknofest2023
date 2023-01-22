@@ -4,7 +4,7 @@
     "stream_cfg": {
         "resolution": [1920, 1080],
         "frame_rate": 30,
-        "buffer_size": 10
+        "buffer_size": 30
     },
 
     "mot_cfg": {
@@ -22,7 +22,7 @@
         },
         "yolo_detector_cfg": {
             "model": "YOLOv4Tiny",
-            "conf_thresh": 0.75,
+            "conf_thresh": 0.25,
             "nms_thresh": 0.5,
             "max_area": 800000,
             "min_aspect_ratio": 0.2
