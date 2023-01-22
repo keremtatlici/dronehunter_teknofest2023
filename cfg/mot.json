@@ -1,5 +1,5 @@
 {   
-    "resize_to": [1280, 720],
+    "resize_to": [640, 480],
 
     "stream_cfg": {
         "resolution": [1920, 1080],
@@ -9,7 +9,7 @@
 
     "mot_cfg": {
         "detector_type": "YOLO",
-        "detector_frame_skip": 5,
+        "detector_frame_skip": 2,
         "class_ids": [0],
 
         "ssd_detector_cfg": {
@@ -22,10 +22,10 @@
         },
         "yolo_detector_cfg": {
             "model": "YOLOv4Tiny",
-            "conf_thresh": 0.25,
+            "conf_thresh": 0.75,
             "nms_thresh": 0.5,
             "max_area": 800000,
-            "min_aspect_ratio": 1.2
+            "min_aspect_ratio": 0.2
         },
         "public_detector_cfg": {
             "sequence_path": "MOT20/train/MOT20-01",

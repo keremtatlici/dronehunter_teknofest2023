@@ -260,9 +260,10 @@ class YOLOv4Tiny(YOLO):
     INPUT_SHAPE = (3, 416, 416)
     LAYER_FACTORS = [32, 16]
     SCALES = [1.05, 1.05]
+#    ANCHORS = [[81,82, 135,169, 344,319],
+#               [23,27, 37,58, 81,82]]
     ANCHORS = [[81,82, 135,169, 344,319],
                [10,14,  23,27,  37,58]]
-
 
 class YOLOv3(YOLO):
     ENGINE_PATH = Path(__file__).parent / 'yolov3.trt'
