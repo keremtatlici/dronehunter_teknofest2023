@@ -254,15 +254,16 @@ class YOLOv4P6(YOLO):
 
 
 class YOLOv4Tiny(YOLO):
-    ENGINE_PATH = Path(__file__).parent / 'yolov4-tiny.trt'
-    MODEL_PATH = Path(__file__).parent /  'yolov4-tiny.onnx'
+    ENGINE_PATH = Path(__file__).parent / 'yolov4tiny_drone.trt'
+    MODEL_PATH = Path(__file__).parent /  'yolov4tiny_drone.onnx'
     NUM_CLASSES = 1
     INPUT_SHAPE = (3, 416, 416)
     LAYER_FACTORS = [32, 16]
     SCALES = [1.05, 1.05]
+#    ANCHORS = [[81,82, 135,169, 344,319],
+#               [23,27, 37,58, 81,82]]
     ANCHORS = [[81,82, 135,169, 344,319],
-               [23,27, 37,58, 81,82]]
-
+               [10,14,  23,27,  37,58]]
 
 class YOLOv3(YOLO):
     ENGINE_PATH = Path(__file__).parent / 'yolov3.trt'
