@@ -22,7 +22,7 @@
         },
         "yolo_detector_cfg": {
             "model": "YOLOv4Tiny",
-            "conf_thresh": 0.75,
+            "conf_thresh": 0.25,
             "nms_thresh": 0.5,
             "max_area": 800000,
             "min_aspect_ratio": 0.2
