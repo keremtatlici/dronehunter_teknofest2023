@@ -3,13 +3,13 @@
 
     "stream_cfg": {
         "resolution": [1920, 1080],
-        "frame_rate": 30,
-        "buffer_size": 10
+        "frame_rate": 25,
+        "buffer_size": 30
     },
 
     "mot_cfg": {
         "detector_type": "YOLO",
-        "detector_frame_skip": 2,
+        "detector_frame_skip": 3,
         "class_ids": [0],
 
         "ssd_detector_cfg": {
@@ -41,17 +41,17 @@
         ],
 
         "tracker_cfg": {
-            "max_age": 6,
-            "age_penalty": 2,
+            "max_age": 20,
+            "age_penalty": 1,
             "motion_weight": 0.2,
-            "max_assoc_cost": 0.8,
-            "max_reid_cost": 0.6,
-            "iou_thresh": 0.4,
+            "max_assoc_cost": 0.6,
+            "max_reid_cost": 0.4,
+            "iou_thresh": 0.2,
             "duplicate_thresh": 0.8,
             "occlusion_thresh": 0.7,
             "conf_thresh": 0.5,
-            "confirm_hits": 1,
-            "history_size": 50,
+            "confirm_hits": 10,
+            "history_size": 150,
 
             "kalman_filter_cfg": {
                 "std_factor_acc": 2.25,
