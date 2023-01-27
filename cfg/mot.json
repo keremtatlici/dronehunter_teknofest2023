@@ -9,7 +9,7 @@
 
     "mot_cfg": {
         "detector_type": "YOLO",
-        "detector_frame_skip": 3,
+        "detector_frame_skip": 1,
         "class_ids": [0],
 
         "ssd_detector_cfg": {
@@ -41,7 +41,7 @@
         ],
 
         "tracker_cfg": {
-            "max_age": 20,
+            "max_age": 30,
             "age_penalty": 1,
             "motion_weight": 0.2,
             "max_assoc_cost": 0.6,

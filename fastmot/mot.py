@@ -162,10 +162,45 @@ class MOT:
         else:
             with Profiler('track'):
                 self.tracker.track(frame)
+        visible_tracks = list(self.visible_tracks())
+        target = []
+        target_bbox = []
+        target_center_x = 0
+        target_center_y = 0
+        target_width = 0
+        target_height=0
+        target_accuracy=None
+        if len(visible_tracks) > 0:
+            max_hits =-1
+            for visible_track in visible_tracks:
+                bbox = visible_track.tlbr
+                width = bbox[2] - bbox[0]
+                height = bbox[3] - bbox[1]
+                hits = visible_track.hits * width * height / 1000 #hitlere bbox boyutunu ağırlık olarak verdim
+                if hits > max_hits:
+                    target = visible_track
+                    target_bbox = bbox
 
-        if self.draw:
-            self._draw(frame, detections)
+                    max_hits= hits
+
+
+            max_hits=-1
+
+            target_center_x = ((target_bbox[0]+target_bbox[2])/2)
+            target_center_y = ((target_bbox[1]+target_bbox[3])/2)
+            target_width=target_bbox[2] - target_bbox[0]
+            target_height=target_bbox[3] - target_bbox[1]
+
+            if len(detections)>0:
+                for detection in detections:
+                    if detection[0].all() == target_bbox.all():
+                        target_accuracy = round(detection[2]*100)
+        if self.draw and len(target)>0:
+            self._draw(frame, detections, target)
         self.frame_count += 1
+
+        return target_center_x, target_center_y, target_width, target_height, target_accuracy
+
 
     @staticmethod
     def print_timing_info():
@@ -188,9 +223,9 @@ class MOT:
             begin = end
         return cls_bboxes
 
-    def _draw(self, frame, detections):
+    def _draw(self, frame, detections, target):
         visible_tracks = list(self.visible_tracks())
-        self.visualizer.render(frame, visible_tracks, detections, self.tracker.klt_bboxes.values(),
+        self.visualizer.render(frame, target, detections, self.tracker.klt_bboxes.values(),
                                self.tracker.flow.prev_bg_keypoints, self.tracker.flow.bg_keypoints)
         cv2.putText(frame, f'visible: {len(visible_tracks)}', (30, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 1, 0, 2, cv2.LINE_AA)

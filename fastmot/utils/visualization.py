@@ -7,16 +7,9 @@ from .rect import get_center
 GOLDEN_RATIO = 0.618033988749895
 
 
-def draw_tracks(frame, tracks, show_flow=False, show_cov=False,
-                show_traj=False):
-    for track in tracks:
-        draw_bbox(frame, track.tlbr, get_color(track.trk_id), 2, str(track.trk_id))
-        if show_traj:
-            draw_trajectory(frame, track.bboxes, track.trk_id)
-        if show_flow:
-            draw_feature_match(frame, track.prev_keypoints, track.keypoints, (0, 255, 255))
-        if show_cov:
-            draw_covariance(frame, track.tlbr, track.state[1])
+def draw_tracks(frame, track, show_flow=False, show_cov=False):
+    draw_bbox(frame, track.tlbr, get_color(track.trk_id), 2, str(track.trk_id))
+
 
 
 def draw_detections(frame, detections, color=(255, 255, 255), show_conf=False):
@@ -56,16 +49,17 @@ def get_color(idx, s=0.8, vmin=0.7):
 
 
 def draw_bbox(frame, tlbr, color, thickness, text=None):
+    color = (255,0,255)
+    text = '0' if text==None else text
     tlbr = tlbr.astype(int)
     tl, br = tuple(tlbr[:2]), tuple(tlbr[2:])
     cv2.rectangle(frame, tl, br, color, thickness)
     if text is not None:
         (text_width, text_height), _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_DUPLEX, 0.5, 1)
         cv2.rectangle(frame, tl, (tl[0] + text_width - 1, tl[1] + text_height - 1),
-                      color, cv2.FILLED)
+                      (color), cv2.FILLED)
         cv2.putText(frame, text, (tl[0], tl[1] + text_height - 1), cv2.FONT_HERSHEY_DUPLEX,
                     0.5, 0, 1, cv2.LINE_AA)
-
 
 def draw_feature_match(frame, prev_pts, cur_pts, color):
     if len(cur_pts) > 0:
@@ -135,9 +129,7 @@ class Visualizer:
 
     def render(self, frame, tracks, detections, klt_bboxes, prev_bg_keypoints, bg_keypoints):
         """Render visualizations onto the frame."""
-        draw_tracks(frame, tracks, show_flow=self.draw_obj_flow,
-                    show_cov=self.draw_covariance,
-                    show_traj=self.draw_trajectory)
+        draw_tracks(frame, tracks, show_flow=self.draw_obj_flow, show_cov=self.draw_covariance)
         if self.draw_detections:
             draw_detections(frame, detections, show_conf=self.draw_confidence)
         if self.draw_klt:

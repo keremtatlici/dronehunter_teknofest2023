@@ -77,6 +77,9 @@ args = parser.parse_args()
 if args.txt is not None and not args.mot:
     raise parser.error('argument -t/--txt: not allowed without argument -m/--mot')
 
+#DATETİME İÇİN FONT
+font = cv2.FONT_HERSHEY_SIMPLEX
+
 # set up logging
 logging.basicConfig(format='%(asctime)s [%(levelname)8s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(fastmot.__name__)
@@ -121,7 +124,9 @@ try:
                 break
 
             if args.mot:
-                mot.step(frame)
+                center_x, center_y, bbox_width, bbox_height, target_accuracy =mot.step(frame)
+                #print(f"center_x: {center_x}, center_y: {center_y}, bbox_width: {bbox_width}, bbox_height: {bbox_height}, accuracy: {target_accuracy}  ")
+                #print(f"accuracy: {target_accuracy}  ")
                 if txt is not None:
                     for track in mot.visible_tracks():
                         tl = track.tlbr[:2] / config.resize_to * stream.resolution
@@ -129,7 +134,8 @@ try:
                         w, h = br - tl + 1
                         txt.write(f'{mot.frame_count},{track.trk_id},{tl[0]:.6f},{tl[1]:.6f},'
                                     f'{w:.6f},{h:.6f},-1,-1,-1\n')
-
+            frame = cv2.putText(frame,f"mAP: {target_accuracy}",(500,20), font, 0.5,(0,0,0),2,cv2.LINE_AA,bottomLeftOrigin=False)
+            frame = cv2.putText(frame,f"mAP: {target_accuracy}",(500,20), font, 0.5,(255,255,255),1,cv2.LINE_AA,bottomLeftOrigin=False)
             if args.show:
                 cv2.imshow('Video', frame)
                 if cv2.waitKey(1) & 0xFF == 27:
