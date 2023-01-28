@@ -11,6 +11,11 @@ import fastmot
 import fastmot.models
 from fastmot.utils import ConfigDecoder, Profiler
 from dronekit import connect,Vehicle
+from time import sleep
+from dronekit import LocationGlobalRelative
+import datetime
+import math
+
 
 #python3 app.py --mot --show --input-uri testset/siha1-input.mp4 --output-uri outputs/siha1-output1.mp4
 #“[Kategorisi]_[Müsabaka No]_[Takım adı]_[Tarih(gg/aa/yyyy)]”
@@ -77,6 +82,30 @@ args = parser.parse_args()
 if args.txt is not None and not args.mot:
     raise parser.error('argument -t/--txt: not allowed without argument -m/--mot')
 
+
+#pixhawk vehicle
+vehicle = connect('/dev/serial/by-id/usb-Hex_ProfiCNC_CubeOrange-bdshot_390020000F51313132383631-if00',wait_ready = False , baud = 57600,vehicle_class = MyVehicle) if args.pixhawk else None
+
+"""
+while True:
+    telemetry_packet = { 
+    "IHA_enlem": vehicle.location.global_relative_frame.lat, 
+    "IHA_boylam": vehicle.location.global_relative_frame.lon, 
+    "IHA_irtifa": vehicle.location.global_relative_frame.alt, 
+    "IHA_dikilme": math.degrees(vehicle.attitude.pitch), 
+    "IHA_yonelme": vehicle.heading, 
+    "IHA_yatis": math.degrees(vehicle.attitude.roll), 
+    "IHA_hiz": vehicle.groundspeed, 
+    "IHA_batarya": vehicle.battery.level,  
+    "GPSSaati": { 
+        "saat": datetime.datetime.fromtimestamp(vehicle.system_time.time_boot_unix/1000000).hour-3, 
+        "dakika": datetime.datetime.fromtimestamp(vehicle.system_time.time_boot_unix/1000000).minute, 
+        "saniye": datetime.datetime.fromtimestamp(vehicle.system_time.time_boot_unix/1000000).second, 
+        "milisaniye": int(datetime.datetime.fromtimestamp(vehicle.system_time.time_boot_unix/1000000).microsecond/1000)}
+    }
+    print(telemetry_packet)
+    sleep(2)
+"""
 #DATETİME İÇİN FONT
 font = cv2.FONT_HERSHEY_SIMPLEX
 
