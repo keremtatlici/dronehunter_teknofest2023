@@ -16,7 +16,7 @@ def connect_to_arduino():
     port: String -> Port bilgisi
     return: serial Object -> arduinonun bağlantı değişkeni
     """
-    return serial.Serial(port=find_arduino_comport(), baudrate=9600, timeout=.1)
+    return serial.Serial(port="/dev/ttyUSB0", baudrate=9600, timeout=.1)
 
 def send_message(arduino, message, delay=3.000):
     """

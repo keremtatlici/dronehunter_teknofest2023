@@ -174,8 +174,8 @@ try:
             frame = cv2.putText(frame,f"mAP: {target_accuracy}",(500,20), db.font, 0.5,(0,0,0),2,cv2.LINE_AA,bottomLeftOrigin=False)
             frame = cv2.putText(frame,f"mAP: {target_accuracy}",(500,20), db.font, 0.5,(255,255,255),1,cv2.LINE_AA,bottomLeftOrigin=False)
 
-            frame = cv2.putText(frame,f"drone_size: {db.drone_size_percentage}",(500,20), db.font, 0.5,(0,0,0),2,cv2.LINE_AA,bottomLeftOrigin=False)
-            frame = cv2.putText(frame,f"drone_size: {db.drone_size_percentage}",(500,20), db.font, 0.5,(255,255,255),1,cv2.LINE_AA,bottomLeftOrigin=False)
+            frame = cv2.putText(frame,f"drone_size: {db.drone_size_percentage}",(500,50), db.font, 0.5,(0,0,0),2,cv2.LINE_AA,bottomLeftOrigin=False)
+            frame = cv2.putText(frame,f"drone_size: {db.drone_size_percentage}",(500,50), db.font, 0.5,(255,255,255),1,cv2.LINE_AA,bottomLeftOrigin=False)
 
 
             db.live_frame = frame
