@@ -133,3 +133,4 @@ fastmot/models/osnet_x0_25_msmt17.trt
 fastmot/models/yolov4_crowdhuman.onnx
 fastmot/models/yolov4_crowdhuman.trt
 results/*
+datasets/drone2.mp4
