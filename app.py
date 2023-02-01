@@ -15,6 +15,8 @@ from time import sleep
 from dronekit import LocationGlobalRelative
 import datetime
 import math
+import database as db
+import arduino_comm
 
 
 #python3 app.py --mot --show --input-uri testset/siha1-input.mp4 --output-uri outputs/siha1-output1.mp4
@@ -84,7 +86,11 @@ if args.txt is not None and not args.mot:
 
 
 #pixhawk vehicle
-vehicle = connect('/dev/serial/by-id/usb-Hex_ProfiCNC_CubeOrange-bdshot_390020000F51313132383631-if00',wait_ready = False , baud = 57600,vehicle_class = MyVehicle) if args.pixhawk else None
+db.vehicle = connect('/dev/serial/by-id/usb-Hex_ProfiCNC_CubeOrange-bdshot_390020000F51313132383631-if00',wait_ready = False , baud = 57600,vehicle_class = MyVehicle) if args.pixhawk else None
+if args.arduino:
+    db.arduino = arduino_comm.connect_to_arduino()
+
+
 
 """
 while True:
@@ -106,8 +112,6 @@ while True:
     print(telemetry_packet)
     sleep(2)
 """
-#DATETİME İÇİN FONT
-font = cv2.FONT_HERSHEY_SIMPLEX
 
 # set up logging
 logging.basicConfig(format='%(asctime)s [%(levelname)8s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
@@ -154,6 +158,10 @@ try:
 
             if args.mot:
                 center_x, center_y, bbox_width, bbox_height, target_accuracy =mot.step(frame)
+                if center_x is not None:
+                    db.drone_size_percentage = (bbox_height*bbox_width / db.screen_size) * 100
+                else:
+                    db.drone_size_percentage=0
                 #print(f"center_x: {center_x}, center_y: {center_y}, bbox_width: {bbox_width}, bbox_height: {bbox_height}, accuracy: {target_accuracy}  ")
                 #print(f"accuracy: {target_accuracy}  ")
                 if txt is not None:
@@ -163,8 +171,14 @@ try:
                         w, h = br - tl + 1
                         txt.write(f'{mot.frame_count},{track.trk_id},{tl[0]:.6f},{tl[1]:.6f},'
                                     f'{w:.6f},{h:.6f},-1,-1,-1\n')
-            frame = cv2.putText(frame,f"mAP: {target_accuracy}",(500,20), font, 0.5,(0,0,0),2,cv2.LINE_AA,bottomLeftOrigin=False)
-            frame = cv2.putText(frame,f"mAP: {target_accuracy}",(500,20), font, 0.5,(255,255,255),1,cv2.LINE_AA,bottomLeftOrigin=False)
+            frame = cv2.putText(frame,f"mAP: {target_accuracy}",(500,20), db.font, 0.5,(0,0,0),2,cv2.LINE_AA,bottomLeftOrigin=False)
+            frame = cv2.putText(frame,f"mAP: {target_accuracy}",(500,20), db.font, 0.5,(255,255,255),1,cv2.LINE_AA,bottomLeftOrigin=False)
+
+            frame = cv2.putText(frame,f"drone_size: {db.drone_size_percentage}",(500,20), db.font, 0.5,(0,0,0),2,cv2.LINE_AA,bottomLeftOrigin=False)
+            frame = cv2.putText(frame,f"drone_size: {db.drone_size_percentage}",(500,20), db.font, 0.5,(255,255,255),1,cv2.LINE_AA,bottomLeftOrigin=False)
+
+
+            db.live_frame = frame
             if args.show:
                 cv2.imshow('Video', frame)
                 if cv2.waitKey(1) & 0xFF == 27:
