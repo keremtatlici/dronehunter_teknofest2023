@@ -86,7 +86,8 @@ if args.txt is not None and not args.mot:
 
 
 #pixhawk vehicle
-db.vehicle = connect('/dev/serial/by-id/usb-Hex_ProfiCNC_CubeOrange-bdshot_390020000F51313132383631-if00',wait_ready = False , baud = 57600,vehicle_class = MyVehicle) if args.pixhawk else None
+#db.vehicle = connect('/dev/serial/by-id/usb-Hex_ProfiCNC_CubeOrange-bdshot_390020000F51313132383631-if00',wait_ready = False , baud = 57600,vehicle_class = MyVehicle) if args.pixhawk else None
+db.vehicle = connect('192.168.137.192',vehicle_class = MyVehicle) if args.pixhawk else None
 if args.arduino:
     db.arduino = arduino_comm.connect_to_arduino()
 

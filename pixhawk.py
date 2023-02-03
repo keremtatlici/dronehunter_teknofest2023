@@ -50,6 +50,20 @@ def icerde_miyiz(lat,lon):
     return polypath.contains_point(myposition)
 
 
+def followtodrone(frame_width, frame_height, center_x, center_y,bbox_width, bbox_height, vehicle):
+    if bbox_width+bbox_height >1:
+            print("OBJECT DETECTİON VAR VE GUİDED")
+            if vehicle.mode != 'GUIDED':
+                vehicle.mode='GUIDED'
+
+            roll = int((center_x-(frame_width/2))/10)
+            pitch = int(((-center_y+(frame_height/2)))/30)
+            #pitch = 0.0
+            #print('###############################################################################################')
+            set_attitude_target(vehicle, roll_angle = roll , pitch_angle = pitch , yaw_angle = None , yaw_rate = 0.0 , use_yaw_rate= False , thrust = 0.5 )
+        
+    elif vehicle.mode != 'AUTO':
+        vehicle.mode = 'AUTO'
 
 def followto(frame_width, frame_height, center_x, center_y,bbox_width, bbox_height, vehicle, hedef_gps=None, roll_sensity = 1, pitch_sensity = 1):
     #orta_konum = (40.2323, 29.0852)
