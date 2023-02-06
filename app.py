@@ -17,6 +17,7 @@ import datetime
 import math
 import database as db
 import arduino_comm
+import pixhawk
 
 
 #python3 app.py --mot --show --input-uri testset/siha1-input.mp4 --output-uri outputs/siha1-output1.mp4
@@ -87,7 +88,7 @@ if args.txt is not None and not args.mot:
 
 #pixhawk vehicle
 #db.vehicle = connect('/dev/serial/by-id/usb-Hex_ProfiCNC_CubeOrange-bdshot_390020000F51313132383631-if00',wait_ready = False , baud = 57600,vehicle_class = MyVehicle) if args.pixhawk else None
-db.vehicle = connect('192.168.137.192',vehicle_class = MyVehicle) if args.pixhawk else None
+db.vehicle = connect('0.0.0.0:8100', wait_ready=True) if args.pixhawk else None
 if args.arduino:
     db.arduino = arduino_comm.connect_to_arduino()
 
@@ -161,6 +162,7 @@ try:
                 center_x, center_y, bbox_width, bbox_height, target_accuracy =mot.step(frame)
                 if center_x is not None:
                     db.drone_size_percentage = (bbox_height*bbox_width / db.screen_size) * 100
+                    #pixhawk.followtodrone(db.frame_width, db.frame_height, center_x, center_y,bbox_width, bbox_height, db.vehicle)
                 else:
                     db.drone_size_percentage=0
                 #print(f"center_x: {center_x}, center_y: {center_y}, bbox_width: {bbox_width}, bbox_height: {bbox_height}, accuracy: {target_accuracy}  ")
