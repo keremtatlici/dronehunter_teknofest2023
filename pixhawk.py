@@ -56,7 +56,7 @@ def followtodrone(frame_width, frame_height, center_x, center_y,bbox_width, bbox
             if vehicle.mode != 'GUIDED':
                 vehicle.mode='GUIDED'
 
-            roll = int((center_x-(frame_width/2))/10)
+            roll = int((center_x-(frame_width/2))/30)
             pitch = int(((-center_y+(frame_height/2)))/30)
             print(f'roll: {roll}, pitch: {pitch}')
             #pitch = 0.0
