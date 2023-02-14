@@ -6,10 +6,35 @@ import time
 import imutils
 import pickle
 import struct
+import base64
+from threading import Thread
 
 ## bu kodun bulundugu ayni yolda database.py diye bir script var bende, sende bos bir database.py scripti olustur.
 ## database.py scriptinde ip = "192.168..." seklinde ip girisi yapman lazim. Gerekli importlari ekleyip gereksiz importlari sil.
 
+def temp_socket():
+    BUFF_SIZE = 65536
+    client_socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+    client_socket.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,BUFF_SIZE)
+    #client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    #host_name = socket.gethostname()
+    #host_ip = socket.gethostbyname(host_name)
+    host_ip =  '192.168.1.103'
+    print(host_ip)
+    port = 9945
+    message = b'Hello'
+
+    client_socket.sendto(message,(host_ip,port))
+    fps,st,frames_to_count,cnt = (0,0,20,0)
+
+    while True:
+        packet,_ = client_socket.recvfrom(BUFF_SIZE)
+        data = base64.b64decode(packet,' /')
+        npdata = np.fromstring(data,dtype=np.uint8)
+        
+        frame = cv2.imdecode(npdata,1)
+
+        db.liveframe=frame
 
 def mission_socket():
     ## BURAYI Ben ayarladim portunu felan degistirebilirsin kendine gore.

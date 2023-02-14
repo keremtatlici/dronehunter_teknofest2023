@@ -6,3 +6,5 @@ frame_height= 480
 screen_size = frame_width*frame_height
 font = cv2.FONT_HERSHEY_SIMPLEX
 drone_size_percentage=0
+
+liveframe = None

@@ -18,7 +18,8 @@ import math
 import database as db
 import arduino_comm
 import pixhawk
-
+import haberlesme
+from threading import Thread
 
 #python3 app.py --mot --show --input-uri testset/siha1-input.mp4 --output-uri outputs/siha1-output1.mp4
 #“[Kategorisi]_[Müsabaka No]_[Takım adı]_[Tarih(gg/aa/yyyy)]”
