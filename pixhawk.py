@@ -51,7 +51,7 @@ def icerde_miyiz(lat,lon):
 
 
 def followtodrone(frame_width, frame_height, center_x, center_y,bbox_width, bbox_height, vehicle):
-    if bbox_width+bbox_height >1:
+    if bbox_width+bbox_height >1 and vehicle.channels['8']==2000:
             print("OBJECT DETECTİON VAR VE GUİDED")
             if vehicle.mode != 'GUIDED':
                 vehicle.mode='GUIDED'
@@ -59,6 +59,8 @@ def followtodrone(frame_width, frame_height, center_x, center_y,bbox_width, bbox
             roll = int((center_x-(frame_width/2))/30)
             pitch = int(((-center_y+(frame_height/2)))/30)
             print(f'roll: {roll}, pitch: {pitch}')
+            roll = 20 if roll>20 else roll
+            pitch = 20 if pitch>20 else pitch
             #pitch = 0.0
             #print('###############################################################################################')
             set_attitude_target(vehicle, roll_angle = roll , pitch_angle = pitch , yaw_angle = None , yaw_rate = 0.0 , use_yaw_rate= False , thrust = 0.5 )

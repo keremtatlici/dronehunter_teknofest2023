@@ -21,6 +21,8 @@ import pixhawk
 import haberlesme
 from threading import Thread
 
+#temp_socket_process = Thread(target=haberlesme.temp_socket)
+#temp_socket_process.start()
 #python3 app.py --mot --show --input-uri testset/siha1-input.mp4 --output-uri outputs/siha1-output1.mp4
 #“[Kategorisi]_[Müsabaka No]_[Takım adı]_[Tarih(gg/aa/yyyy)]”
 #“SabitKanat_4_Atmosfer-Havacilik-Takimi_07_09_2021.mp4”
@@ -93,7 +95,11 @@ db.vehicle = connect('0.0.0.0:8100', wait_ready=True) if args.pixhawk else None
 if args.arduino:
     db.arduino = arduino_comm.connect_to_arduino()
 
-
+if args.sunucu:
+    #db.telemetry_socket.start()
+    db.liveframe_socket.start()
+    #db.missionstart_socket.start() 
+    #db.firepermission_socket.start()
 
 """
 while True:
@@ -182,7 +188,7 @@ try:
             frame = cv2.putText(frame,f"drone_size: {db.drone_size_percentage}",(500,50), db.font, 0.5,(255,255,255),1,cv2.LINE_AA,bottomLeftOrigin=False)
 
 
-            db.live_frame = frame
+            db.liveframe = frame
             if args.show:
                 cv2.imshow('Video', frame)
                 if cv2.waitKey(1) & 0xFF == 27:
