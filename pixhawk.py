@@ -3,11 +3,13 @@ from dronekit import connect
 import math
 import matplotlib.path as mplpath
 import numpy as np
-from dronekit import LocationGlobalRelative
+from dronekit import LocationGlobalRelative, mavutil
 import database as db
+from threading import Thread
 
 #vehicle = connect('/dev/ttyTHS1',wait_ready = True)
 #vehicle.mode = "GUIDED"
+
 
 def set_attitude_target(vehicle ,roll_angle = 0.0, pitch_angle = 0.0, yaw_angle = None,yaw_rate=0.0,use_yaw_rate=False,thrust= 0.5):
     if yaw_angle is None:
@@ -50,23 +52,50 @@ def icerde_miyiz(lat,lon):
     return polypath.contains_point(myposition)
 
 
-def followtodrone(frame_width, frame_height, center_x, center_y,bbox_width, bbox_height, vehicle):
-    if bbox_width+bbox_height >1 and vehicle.channels['8']==2000:
+def followtodrone(frame_width, frame_height, center_x, center_y,bbox_width, bbox_height, vehicle,  drone_size_percentage):
+    if bbox_width+bbox_height >1:# and vehicle.channels['8']==2000:
             print("OBJECT DETECTİON VAR VE GUİDED")
             if vehicle.mode != 'GUIDED':
                 vehicle.mode='GUIDED'
 
             roll = int((center_x-(frame_width/2))/30)
-            pitch = int(((-center_y+(frame_height/2)))/30)
-            print(f'roll: {roll}, pitch: {pitch}')
             roll = 20 if roll>20 else roll
+
+            if drone_size_percentage <10:
+                pitch=-(100-drone_size_percentage)/30
+            else:
+                pitch = 0.0
+            #pitch = int(((-center_y+(frame_height/2)))/30)
+            
             pitch = 20 if pitch>20 else pitch
-            #pitch = 0.0
-            #print('###############################################################################################')
-            set_attitude_target(vehicle, roll_angle = roll , pitch_angle = pitch , yaw_angle = None , yaw_rate = 0.0 , use_yaw_rate= False , thrust = 0.5 )
-        
+            
+            altdelta= (-center_y+(frame_height/2))/100
+            if altdelta >1:
+                altdelta=1
+            elif altdelta< -1:
+                altdelta=-1
+            thrust=0.5
+            if vehicle.location.global_relative_frame.alt> 5:
+                thrust+=(altdelta)/10
+
+            if thrust < 0.45:
+                thrust=0.45
+            elif thrust >0.55:
+                thrust=0.55
+
+
+            
+            print(f'roll: {roll}, pitch: {pitch}, altitude: {altdelta}, thurst: {thrust}')
+            
+            
+            set_attitude_target(vehicle, roll_angle = roll , pitch_angle = pitch , yaw_angle = None , yaw_rate = 0.0 , use_yaw_rate= False , thrust =thrust )
+            sleep(2)
     elif vehicle.mode != 'AUTO':
-        vehicle.mode = 'AUTO'
+        if db.auto_counter >10:
+            vehicle.mode = 'AUTO'
+            db.auto_counter=0
+        else:
+            db.auto_counter+=1
 
 def followto(frame_width, frame_height, center_x, center_y,bbox_width, bbox_height, vehicle, hedef_gps=None, roll_sensity = 1, pitch_sensity = 1):
     #orta_konum = (40.2323, 29.0852)
@@ -147,9 +176,12 @@ def to_quaternion(roll = 0.0, pitch = 0.0, yaw = 0.0):
     x = t0 * t3 * t4 - t1 * t2 * t5
     y = t0 * t2 * t5 + t1 * t3 * t4
     z = t1 * t2 * t4 - t0 * t3 * t5
-
-    return [w, x, y, z]
+    
+    #print([w, x, y, z])
+    result = [w, x, y, z]
+    return result
        
+    set_attitude_target(vehicle,roll_angle=10)
     
     
-    
+db.followto_socket= Thread(target=followtodrone) 

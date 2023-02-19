@@ -1,5 +1,5 @@
 import cv2
-ip = "172.21.67.150"
+ip = "192.168.1.5"
 
 frame_width = 640
 frame_height= 480
@@ -15,3 +15,6 @@ telemetry_socket=None
 liveframe_socket=None
 missionstart_socket=None
 firepermission_socket=None
+followto_socket=None
+
+auto_counter= 0

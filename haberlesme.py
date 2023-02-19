@@ -7,7 +7,10 @@ import threading
 import sys
 import keyboard
 import database as db
-
+from time import sleep
+import math
+import json
+import pickle
 
 def temp_socket():
     BUFF_SIZE = 65536
@@ -16,7 +19,6 @@ def temp_socket():
     #client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     #host_name = socket.gethostname()
     #db.ip = socket.gethostbyname(host_name)
-    db.ip =  '192.168.1.103'
     print(db.ip)
     port = 9945
     message = b'Hello'
@@ -26,12 +28,14 @@ def temp_socket():
 
     while True:
         packet,_ = client_socket.recvfrom(BUFF_SIZE)
+        #print("MESAJ ALINDII!!!!!!!!!!!!!!!!!!!!!!!!")
         data = base64.b64decode(packet,' /')
         npdata = np.fromstring(data,dtype=np.uint8)
         
         frame = cv2.imdecode(npdata,1)
 
         db.liveframe=frame
+        sleep(0.1)
 
 class thread_with_trace(threading.Thread):
   def __init__(self, *args, **keywords):
@@ -112,10 +116,24 @@ def telemetrik():
     connTelemetrik, addressTelemetrik = server_socketTelemetrik.accept()
     print("Connection from: " + str(addressTelemetrik))
     while True:
-        data = connTelemetrik.recv(1024).decode()
-        for key, value in db.data.items():
-            data = key + " " + value
-            connTelemetrik.send(data.encode()) 
+      telemetry_packet = { 
+        "la": float(db.vehicle.location.global_relative_frame.lat), #latitude
+        "lo": float(db.vehicle.location.global_relative_frame.lon), #longtitude
+        "al": float(db.vehicle.location.global_relative_frame.alt), #altitude
+        "pi": float(math.degrees(db.vehicle.attitude.pitch)),       #pitch 
+        "ro": float(math.degrees(db.vehicle.attitude.roll)),        #roll
+        "ya": float(math.degrees(db.vehicle.attitude.yaw)),         #yaw
+        "av": float(db.vehicle.airspeed),                           #airspeed
+        "gv": float(db.vehicle.groundspeed),                        #groundspeed
+        "bt": float(db.vehicle.battery.level),                      #battery
+      }
+
+      data = json.dumps(telemetry_packet)
+      #print(data)
+      #print(type(data))
+      data = pickle.dumps(data)
+      connTelemetrik.send(data)  
+      sleep(1)
       
 def frame():
   portFrame = 9945
@@ -127,7 +145,8 @@ def frame():
   msg,client_addr = server_socketFrame.recvfrom(BUFF_SIZE)
   while True:
     if db.liveframe is not None :
-      encoded,buffer = cv2.imencode('.jpg',db.liveframe,[cv2.IMWRITE_JPEG_QUALITY,80])
+      time.sleep(0.01)
+      encoded,buffer = cv2.imencode('.jpg',db.liveframe,[cv2.IMWRITE_JPEG_QUALITY,50])
       message = base64.b64encode(buffer)
       server_socketFrame.sendto(message, client_addr)
       

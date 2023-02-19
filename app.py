@@ -96,7 +96,7 @@ if args.arduino:
     db.arduino = arduino_comm.connect_to_arduino()
 
 if args.sunucu:
-    #db.telemetry_socket.start()
+    db.telemetry_socket.start()
     db.liveframe_socket.start()
     #db.missionstart_socket.start() 
     #db.firepermission_socket.start()
@@ -104,19 +104,14 @@ if args.sunucu:
 """
 while True:
     telemetry_packet = { 
-    "IHA_enlem": vehicle.location.global_relative_frame.lat, 
-    "IHA_boylam": vehicle.location.global_relative_frame.lon, 
-    "IHA_irtifa": vehicle.location.global_relative_frame.alt, 
-    "IHA_dikilme": math.degrees(vehicle.attitude.pitch), 
-    "IHA_yonelme": vehicle.heading, 
-    "IHA_yatis": math.degrees(vehicle.attitude.roll), 
-    "IHA_hiz": vehicle.groundspeed, 
-    "IHA_batarya": vehicle.battery.level,  
-    "GPSSaati": { 
-        "saat": datetime.datetime.fromtimestamp(vehicle.system_time.time_boot_unix/1000000).hour-3, 
-        "dakika": datetime.datetime.fromtimestamp(vehicle.system_time.time_boot_unix/1000000).minute, 
-        "saniye": datetime.datetime.fromtimestamp(vehicle.system_time.time_boot_unix/1000000).second, 
-        "milisaniye": int(datetime.datetime.fromtimestamp(vehicle.system_time.time_boot_unix/1000000).microsecond/1000)}
+    "lat": float(vehicle.location.global_relative_frame.lat), 
+    "lon": float(vehicle.location.global_relative_frame.lon), 
+    "alt": float(vehicle.location.global_relative_frame.alt), 
+    "pitch": float(math.degrees(vehicle.attitude.pitch)),  
+    "roll": float(math.degrees(vehicle.attitude.roll)), 
+    "yaw": float(math.degrees(vehicle.attitude.yaw)), 
+    "ground_velocy": float(vehicle.groundspeed), 
+    "battery": float(vehicle.battery.level),  
     }
     print(telemetry_packet)
     sleep(2)
@@ -164,16 +159,25 @@ try:
             frame = stream.read()
             if frame is None:
                 break
-
+           
+            # if db.liveframe is not None:
+            #     frame = db.liveframe
+            # else:
+            #     print('live frame none geliyor !!!!')
+            
             if args.mot:
                 center_x, center_y, bbox_width, bbox_height, target_accuracy =mot.step(frame)
                 if center_x is not None:
                     db.drone_size_percentage = (bbox_height*bbox_width / db.screen_size) * 100
-                    #pixhawk.followtodrone(db.frame_width, db.frame_height, center_x, center_y,bbox_width, bbox_height, db.vehicle)
+
+                    if not db.followto_socket.is_alive() and args.pixhawk:
+                        db.followto_socket = Thread(target=pixhawk.followtodrone, args=(db.frame_width, db.frame_height, center_x, center_y,bbox_width, bbox_height, db.vehicle,  db.drone_size_percentage))
+                        db.followto_socket.start()
                 else:
                     db.drone_size_percentage=0
                 #print(f"center_x: {center_x}, center_y: {center_y}, bbox_width: {bbox_width}, bbox_height: {bbox_height}, accuracy: {target_accuracy}  ")
                 #print(f"accuracy: {target_accuracy}  ")
+
                 if txt is not None:
                     for track in mot.visible_tracks():
                         tl = track.tlbr[:2] / config.resize_to * stream.resolution
