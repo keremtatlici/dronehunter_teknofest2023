@@ -2,14 +2,14 @@
     "resize_to": [640, 480],
 
     "stream_cfg": {
-        "resolution": [1920, 1080],
-        "frame_rate": 25,
+        "resolution": [1280, 720],
+        "frame_rate": 60,
         "buffer_size": 30
     },
 
     "mot_cfg": {
         "detector_type": "YOLO",
-        "detector_frame_skip": 1,
+        "detector_frame_skip": 5,
         "class_ids": [0],
 
         "ssd_detector_cfg": {

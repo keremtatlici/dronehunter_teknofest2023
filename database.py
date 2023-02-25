@@ -1,5 +1,5 @@
 import cv2
-ip = "192.168.1.5"
+ip = "172.21.73.21"
 
 frame_width = 640
 frame_height= 480

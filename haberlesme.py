@@ -134,8 +134,43 @@ def telemetrik():
       data = pickle.dumps(data)
       connTelemetrik.send(data)  
       sleep(1)
-      
+
 def frame():
+  portFrame = 9945
+  portFrame2 = 9955
+  BUFF_SIZE = 65536
+
+  server_socketFrame = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+  server_socketFrame.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,BUFF_SIZE)
+
+  server_socketFrame2 = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+  server_socketFrame2.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,BUFF_SIZE)
+
+  socket_address = (db.ip,portFrame)
+  server_socketFrame.bind(socket_address)
+
+  socket_address2 = (db.ip,portFrame2)
+  server_socketFrame2.bind(socket_address2)
+
+  msg,client_addr = server_socketFrame.recvfrom(BUFF_SIZE)
+  msg2,client_addr2 = server_socketFrame2.recvfrom(BUFF_SIZE)
+
+  while True:
+    if db.liveframe is not None :
+      frame = db.liveframe
+      frame = imutils.resize(frame,width=400)
+      encoded,buffer = cv2.imencode('.jpg',frame,[cv2.IMWRITE_JPEG_QUALITY,60])
+
+      buffer1 = buffer[:len(buffer)]
+      message = base64.b64encode(buffer1)
+
+      buffer2 = buffer[len(buffer):]
+      message2 = base64.b64encode(buffer2)
+
+      server_socketFrame.sendto(message, client_addr)
+      server_socketFrame2.sendto(message2, client_addr2)
+
+"""def frame():
   portFrame = 9945
   BUFF_SIZE = 65536
   server_socketFrame = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
@@ -148,7 +183,7 @@ def frame():
       time.sleep(0.01)
       encoded,buffer = cv2.imencode('.jpg',db.liveframe,[cv2.IMWRITE_JPEG_QUALITY,50])
       message = base64.b64encode(buffer)
-      server_socketFrame.sendto(message, client_addr)
+      server_socketFrame.sendto(message, client_addr)"""
       
 db.telemetry_socket = thread_with_trace(target = telemetrik)
 db.liveframe_socket = thread_with_trace(target = frame)

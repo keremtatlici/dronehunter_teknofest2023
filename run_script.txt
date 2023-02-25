@@ -1,3 +1,7 @@
 python3 app.py --input-uri datasets/peoplewalking.mp4 --mot --show
 python3 app.py --input-uri datasets/drone1.mp4 --mot --show
 ./scripts/yolo2onnx.py --config yolov4tiny_drone.cfg --weights yolov4tiny_drone.weights
+
+python3 app.py --input-uri csi://0 --mot --show --pixhawk --sunucu
+
+python3 app.py --input-uri datasets/drone1.mp4 --mot --show --sunucu --pixhawk
