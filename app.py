@@ -21,8 +21,7 @@ import pixhawk
 import haberlesme
 from threading import Thread
 
-#temp_socket_process = Thread(target=haberlesme.temp_socket)
-#temp_socket_process.start()
+
 #python3 app.py --mot --show --input-uri testset/siha1-input.mp4 --output-uri outputs/siha1-output1.mp4
 #“[Kategorisi]_[Müsabaka No]_[Takım adı]_[Tarih(gg/aa/yyyy)]”
 #“SabitKanat_4_Atmosfer-Havacilik-Takimi_07_09_2021.mp4”
@@ -79,6 +78,7 @@ optional.add_argument('-p', '--pixhawk', action='store_true', help='pixhawk bagl
 optional.add_argument('-a', '--sunucu', action='store_true', help='sunucuya bağlanacaksan satıra yaz')
 #ARDUINO ARGUMANI EKLENDİ
 optional.add_argument('-d', '--arduino', action='store_true', help='arduino bağlanacaksan satıra yaz')
+optional.add_argument('-g', '--gazebo', action='store_true', help='gazeboya bağlanacaksan satıra yaz')
 
 optional.add_argument('-s', '--show', action='store_true', help='show visualizations')
 group.add_argument('-q', '--quiet', action='store_true', help='reduce output verbosity')
@@ -90,8 +90,11 @@ if args.txt is not None and not args.mot:
 
 
 #pixhawk vehicle
-#db.vehicle = connect('/dev/serial/by-id/usb-Hex_ProfiCNC_CubeOrange-bdshot_390020000F51313132383631-if00',wait_ready = False , baud = 57600,vehicle_class = MyVehicle) if args.pixhawk else None
-db.vehicle = connect('0.0.0.0:8100', wait_ready=True) if args.pixhawk else None
+db.vehicle = connect('/dev/serial/by-id/usb-Hex_ProfiCNC_CubeOrange-bdshot_390020000F51313132383631-if00',wait_ready = False , baud = 57600,vehicle_class = MyVehicle) if args.pixhawk else None
+if args.gazebo:
+    db.vehicle = connect('0.0.0.0:8100', wait_ready=True) if args.gazebo else None
+    temp_socket_process = Thread(target=haberlesme.temp_socket)
+    temp_socket_process.start()
 if args.arduino:
     db.arduino = arduino_comm.connect_to_arduino()
 
@@ -101,21 +104,6 @@ if args.sunucu:
     #db.missionstart_socket.start() 
     #db.firepermission_socket.start()
 
-"""
-while True:
-    telemetry_packet = { 
-    "lat": float(vehicle.location.global_relative_frame.lat), 
-    "lon": float(vehicle.location.global_relative_frame.lon), 
-    "alt": float(vehicle.location.global_relative_frame.alt), 
-    "pitch": float(math.degrees(vehicle.attitude.pitch)),  
-    "roll": float(math.degrees(vehicle.attitude.roll)), 
-    "yaw": float(math.degrees(vehicle.attitude.yaw)), 
-    "ground_velocy": float(vehicle.groundspeed), 
-    "battery": float(vehicle.battery.level),  
-    }
-    print(telemetry_packet)
-    sleep(2)
-"""
 
 # set up logging
 logging.basicConfig(format='%(asctime)s [%(levelname)8s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
@@ -159,18 +147,18 @@ try:
             frame = stream.read()
             if frame is None:
                 break
-           
-            # if db.liveframe is not None:
-            #     frame = db.liveframe
-            # else:
-            #     print('live frame none geliyor !!!!')
-            
+            if args.gazebo:
+                if db.liveframe is not None:
+                    frame = db.liveframe
+                else:
+                    print('live frame none geliyor !!!!')
+                
             if args.mot:
                 center_x, center_y, bbox_width, bbox_height, target_accuracy =mot.step(frame)
                 if center_x is not None:
                     db.drone_size_percentage = (bbox_height*bbox_width / db.screen_size) * 100
 
-                    if not db.followto_socket.is_alive() and args.pixhawk:
+                    if not db.followto_socket.is_alive() and (args.pixhawk or args.gazebo):
                         db.followto_socket = Thread(target=pixhawk.followtodrone, args=(db.frame_width, db.frame_height, center_x, center_y,bbox_width, bbox_height, db.vehicle,  db.drone_size_percentage))
                         db.followto_socket.start()
                 else:
@@ -191,8 +179,8 @@ try:
             frame = cv2.putText(frame,f"drone_size: {db.drone_size_percentage}",(500,50), db.font, 0.5,(0,0,0),2,cv2.LINE_AA,bottomLeftOrigin=False)
             frame = cv2.putText(frame,f"drone_size: {db.drone_size_percentage}",(500,50), db.font, 0.5,(255,255,255),1,cv2.LINE_AA,bottomLeftOrigin=False)
 
-
-            db.liveframe = frame
+            if not args.gazebo:
+                db.liveframe = frame
             if args.show:
                 cv2.imshow('Video', frame)
                 if cv2.waitKey(1) & 0xFF == 27:

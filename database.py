@@ -1,5 +1,6 @@
 import cv2
 ip = "172.21.73.21"
+gazebo_ip="192.168.1.103"
 
 frame_width = 640
 frame_height= 480

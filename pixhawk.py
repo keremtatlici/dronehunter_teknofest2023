@@ -13,7 +13,7 @@ from threading import Thread
 
 def set_attitude_target(vehicle ,roll_angle = 0.0, pitch_angle = 0.0, yaw_angle = None,yaw_rate=0.0,use_yaw_rate=False,thrust= 0.5):
     if yaw_angle is None:
-        yaw_angle = math.degree(vehicle.attitude.yaw)
+        yaw_angle = math.degrees(vehicle.attitude.yaw)
 
     msg = vehicle.message_factory.set_attitude_target_encode(
         0,
@@ -83,6 +83,10 @@ def followtodrone(frame_width, frame_height, center_x, center_y,bbox_width, bbox
             elif thrust >0.55:
                 thrust=0.55
 
+            if drone_size_percentage<3:
+                pitch=-2.0
+            else:
+                pitch=0.0
 
             
             print(f'roll: {roll}, pitch: {pitch}, altitude: {altdelta}, thurst: {thrust}')
@@ -90,11 +94,14 @@ def followtodrone(frame_width, frame_height, center_x, center_y,bbox_width, bbox
             
             set_attitude_target(vehicle, roll_angle = roll , pitch_angle = pitch , yaw_angle = None , yaw_rate = 0.0 , use_yaw_rate= False , thrust =thrust )
             sleep(2)
+
     elif vehicle.mode != 'AUTO':
-        if db.auto_counter >10:
+        if db.auto_counter >6:
             vehicle.mode = 'AUTO'
             db.auto_counter=0
         else:
+            set_attitude_target(vehicle, roll_angle = 0.0 , pitch_angle = 0.0 , yaw_angle = None , yaw_rate = 0.0 , use_yaw_rate= False , thrust =0.5 )
+            sleep(0.5)
             db.auto_counter+=1
 
 def followto(frame_width, frame_height, center_x, center_y,bbox_width, bbox_height, vehicle, hedef_gps=None, roll_sensity = 1, pitch_sensity = 1):

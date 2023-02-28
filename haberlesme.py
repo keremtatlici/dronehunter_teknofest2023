@@ -19,11 +19,11 @@ def temp_socket():
     #client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     #host_name = socket.gethostname()
     #db.ip = socket.gethostbyname(host_name)
-    print(db.ip)
+    print(db.gazebo_ip)
     port = 9945
     message = b'Hello'
 
-    client_socket.sendto(message,(db.ip,port))
+    client_socket.sendto(message,(db.gazebo_ip,port))
     fps,st,frames_to_count,cnt = (0,0,20,0)
 
     while True:
@@ -35,7 +35,7 @@ def temp_socket():
         frame = cv2.imdecode(npdata,1)
 
         db.liveframe=frame
-        sleep(0.1)
+        sleep(0.05)
 
 class thread_with_trace(threading.Thread):
   def __init__(self, *args, **keywords):
