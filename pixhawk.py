@@ -13,7 +13,7 @@ from threading import Thread
 
 def set_attitude_target(vehicle ,roll_angle = 0.0, pitch_angle = 0.0, yaw_angle = None,yaw_rate=0.0,use_yaw_rate=False,thrust= 0.5):
     if yaw_angle is None:
-        yaw_angle = vehicle.attitude.yaw
+        yaw_angle = math.degree(vehicle.attitude.yaw)
 
     msg = vehicle.message_factory.set_attitude_target_encode(
         0,
