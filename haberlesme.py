@@ -35,7 +35,7 @@ def temp_socket():
         frame = cv2.imdecode(npdata,1)
 
         db.liveframe=frame
-        sleep(0.05)
+        sleep(0.1)
 
 class thread_with_trace(threading.Thread):
   def __init__(self, *args, **keywords):

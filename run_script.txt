@@ -5,3 +5,7 @@ python3 app.py --input-uri datasets/drone1.mp4 --mot --show
 python3 app.py --input-uri csi://0 --mot --show --pixhawk --sunucu
 
 python3 app.py --input-uri datasets/drone1.mp4 --mot --show --sunucu --pixhawk
+
+
+##Gazebolu kod(sunucusuz)
+python3 app.py --input-uri datasets/drone2.mp4 --mot --show --gazebo
