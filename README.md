@@ -1,12 +1,5 @@
-# FastMOT
+# Drone Hunter
 <img src="assets/dense_demo.gif" width="400"/> <img src="assets/aerial_demo.gif" width="400"/>
-
-## News
-  - (2021.8.17) Support multi-class tracking
-  - (2021.7.4) Support yolov4-p5 and yolov4-p6
-  - (2021.2.13) Support Scaled-YOLOv4 (i.e. yolov4-csp/yolov4x-mish/yolov4-csp-swish)
-  - (2021.1.3) Add DIoU-NMS for postprocessing
-  - (2020.11.28) Docker container provided for x86 Ubuntu
 
 ## Description
 FastMOT is a custom multiple object tracker that implements:
@@ -172,18 +165,3 @@ FastMOT also supports multi-class tracking. It is recommended to train a ReID ne
         Distance metric used to match features.
     ```
 2. Modify cfg/mot.json: set `model` in `feature_extractor_cfgs` to the added Python class name. For more than one class, add more feature extractor configurations to the list `feature_extractor_cfgs`. You may want to play with `max_assoc_cost` and `max_reid_cost` based on model performance
-
- ## Citation
- If you find this repo useful in your project or research, please star and consider citing it:
- ```bibtex
-@software{yukai_yang_2020_4294717,
-  author       = {Yukai Yang},
-  title        = {{FastMOT: High-Performance Multiple Object Tracking Based on Deep SORT and KLT}},
-  month        = nov,
-  year         = 2020,
-  publisher    = {Zenodo},
-  version      = {v1.0.0},
-  doi          = {10.5281/zenodo.4294717},
-  url          = {https://doi.org/10.5281/zenodo.4294717}
-}
-```
