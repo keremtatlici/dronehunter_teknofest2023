@@ -23,6 +23,10 @@ import math
 #python3 app.py --mot --show --input-uri /dev/video2 --output-uri outputs/SabitKanat_7_Atmosfer-Havacilik-Takimi_09_09_2021.mp4 -p -a
 #mavproxy.py --console --master=/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_AR0K76MI-if00-port0 --baudrate 57600 --out 127.0.0.1:14550
 class MyVehicle(Vehicle):
+    """
+    Custom Vehicle class inheriting from DroneKit's Vehicle.
+    Used to access system time messages and store them in a custom structure.
+    """
     def __init__(self, connection_string):
         super(MyVehicle, self).__init__(connection_string)
         self._system_time = SystemTIME()
@@ -34,9 +38,15 @@ class MyVehicle(Vehicle):
 
     @property
     def system_time(self):
+        """
+        Exposes the system_time object so it can be accessed like vehicle.system_time.
+        """
         return self._system_time
 
 class SystemTIME(object):
+    """
+    Simple class to store system time data from the drone.
+    """
     def __init__(self, time_boot_unix=None , time_boot_ms=None):
         self.time_boot_unix = time_boot_unix
         self.time_boot_ms = time_boot_ms
@@ -44,10 +54,17 @@ class SystemTIME(object):
         return "{}".format(self.time_boot_unix,self.time_boot_ms)
 
 
+# ------------------- ARGUMENT PARSING ------------------- #
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+
+# Separate optional vs. required arguments for readability
 optional = parser._action_groups.pop()
 required = parser.add_argument_group('required arguments')
+
+# Mutually exclusive group for verbosity control (quiet or verbose)
 group = parser.add_mutually_exclusive_group()
+
+# Required argument: input URI
 required.add_argument('-i', '--input-uri', metavar="URI", required=True, help=
                         'URI to input stream\n'
                         '1) image sequence (e.g. %%06d.jpg)\n'
@@ -56,6 +73,8 @@ required.add_argument('-i', '--input-uri', metavar="URI", required=True, help=
                         '4) USB camera (e.g. /dev/video0)\n'
                         '5) RTSP stream (e.g. rtsp://<user>:<password>@<ip>:<port>/<path>)\n'
                         '6) HTTP stream (e.g. http://<user>:<password>@<ip>:<port>/<path>)\n')
+
+# Optional arguments
 optional.add_argument('-c', '--config', metavar="FILE",
                         default=Path(__file__).parent / 'cfg' / 'mot.json',
                         help='path to JSON configuration file')
@@ -83,9 +102,10 @@ if args.txt is not None and not args.mot:
     raise parser.error('argument -t/--txt: not allowed without argument -m/--mot')
 
 
-#pixhawk vehicle
+# ------------------- VEHICLE CONNECTION ------------------- #
 vehicle = connect('/dev/serial/by-id/usb-Hex_ProfiCNC_CubeOrange-bdshot_390020000F51313132383631-if00',wait_ready = False , baud = 57600,vehicle_class = MyVehicle) if args.pixhawk else None
 
+# -------------- EXAMPLE DRONEKIT LOOP (commented out) --------------#
 """
 while True:
     telemetry_packet = { 
@@ -109,7 +129,7 @@ while True:
 #DATETİME İÇİN FONT
 font = cv2.FONT_HERSHEY_SIMPLEX
 
-# set up logging
+# ------------------- LOGGING SETUP ------------------- #
 logging.basicConfig(format='%(asctime)s [%(levelname)8s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(fastmot.__name__)
 if args.quiet:
@@ -119,7 +139,8 @@ elif args.verbose:
 else:
     logger.setLevel(logging.INFO)
 
-# load config file
+
+# ------------------- LOAD CONFIG / LABELS ------------------- #
 with open(args.config) as cfg_file:
     config = json.load(cfg_file, cls=ConfigDecoder, object_hook=lambda d: SimpleNamespace(**d))
 
@@ -129,6 +150,7 @@ if args.labels is not None:
         label_map = label_file.read().splitlines()
         fastmot.models.set_label_map(label_map)
 
+# ------------------- VIDEO STREAM SETUP ------------------- #
 stream = fastmot.VideoIO(config.resize_to, args.input_uri, args.output_uri, **vars(config.stream_cfg))
 
 mot = None
@@ -178,7 +200,7 @@ finally:
     stream.release()
     cv2.destroyAllWindows()
 
-# timing statistics
+# ------------------- TIMING STATISTICS ------------------- #
 if args.mot:
     avg_fps = round(mot.frame_count / prof.duration)
     logger.info('Average FPS: %d', avg_fps)
